@@ -11,12 +11,13 @@ import java.io.File;
  */
 public class AssetLoader
 {
+    //Variables for textures.
     public static Texture sTexture, sLogoTexture;
     public static TextureRegion logo, up, down, left, right, upRight, upLeft, downRight, downLeft,
             sUp, sDown, sLeft, sRight, sUpRight, sUpLeft, sDownRight, sDownLeft,
             bg, p1, p2, add, moveCenter, shootCenter;
 
-    //Set textures to the buttons
+    //Set textures to the objects.
     public static void load()
     {
         sLogoTexture = new Texture(Gdx.files.internal("data" + File.separator + "logo.png"));
@@ -50,7 +51,6 @@ public class AssetLoader
         add = new TextureRegion(sTexture, 0, 26, 11, 11);
         moveCenter = new TextureRegion(sTexture, 11, 26, 11, 11);
         shootCenter = new TextureRegion(sTexture, 22, 26, 11, 11);
-
     }
 
     public static void dispose()

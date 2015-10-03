@@ -5,8 +5,8 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.tsuruta.twosteps.TSGame;
 
-public class HtmlLauncher extends GwtApplication {
-
+public class HtmlLauncher extends GwtApplication
+{
         @Override
         public GwtApplicationConfiguration getConfig () {
                 return new GwtApplicationConfiguration(480, 320);

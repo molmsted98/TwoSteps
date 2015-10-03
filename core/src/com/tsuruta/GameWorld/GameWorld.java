@@ -16,25 +16,24 @@ public class GameWorld
     private Player mPlayer;
     private Player cPlayer;
     private Board mBoard;
-    private Rectangle ground;
-    private int score = 0;
     private float runTime = 0;
     private int midPointY;
     private GameRenderer renderer;
     private int turn = 0;
     private int currentTurn = 0;
     private String[] moves = {"add", "add", "add"};
+    //TODO: Implent computer's logic using move list.
     private String[] cMoves = {"add", "add", "add"};
 
     private GameState currentState;
 
-    //Switch between screens
+    //Variable to know which screen is to be shown.
     public enum GameState
     {
         MENU, RUNNING, CHOICE, GAMEOVER, HIGHSCORE
     }
 
-    //Initialize variables
+    //Initialize instance variables. Make players and board.
     public GameWorld(int midPointY)
     {
         currentState = GameState.MENU;
@@ -42,80 +41,51 @@ public class GameWorld
         mPlayer = new Player(1, 1, 3);
         mBoard = new Board(9);
         cPlayer = new Player(mBoard.getSize(), mBoard.getSize(), 3);
-        // The grass should start 66 pixels below the midPointY
-        ground = new Rectangle(0, midPointY + 66, 137, 11);
     }
 
-    //Based on state run other updates
+    //Run other update methods depending on game state.
     public void update(float delta)
     {
         runTime += delta;
-
         switch (currentState)
         {
             case MENU:
-                updateReady(delta);
                 break;
-
             case CHOICE:
             case RUNNING:
                 updateRunning(delta);
                 break;
-
             default:
                 break;
         }
-
     }
 
-    //Prevent either player from leaving field
-    private boolean checkCollision(int direction, Player playerr)
+    //Run the game.
+    public void updateRunning(float delta)
     {
-        int xLoc = playerr.getxLoc();
-        int yLoc = playerr.getyLoc();
-        int size = mBoard.getSize();
-        // upLeft, down, up, upRight, downLeft, left, right, downRight
-        switch (direction)
+        //Prevent frame skipping
+        if (delta > .15f)
         {
-            case 1:
-                return (xLoc - 1 == 0 || yLoc - 1 == 0);
-            case 2:
-                return (yLoc + 1 > size);
-            case 3:
-                return (yLoc - 1 == 0);
-            case 4:
-                return (xLoc + 1 > size || yLoc - 1 == 0);
-            case 5:
-                return (xLoc - 1 == 0 || yLoc + 1 > size);
-            case 6:
-                return (xLoc - 1 == 0);
-            case 7:
-                return (xLoc + 1 > size);
-            case 8:
-                return (xLoc + 1 > size || yLoc + 1 > size);
-            default:
-                return true;
+            delta = .15f;
         }
-    }
-
-    //Maybe useless?
-    //TODO: Check if this can be removed
-    private void updateReady(float delta) {
-        mPlayer.updateReady(runTime);
+        runComputer();
+        runPlayer(getMoves()[0]);
     }
 
     //Move the Computer
     public void runComputer()
     {
+        //Only move after two turns.
         if (currentTurn != turn && turn > 2)
         {
+            //Pick a random move, then check for collision.
             Random rand = new Random();
             int randomNum = rand.nextInt((8 - 1) + 1) + 1;
             if(checkCollision(randomNum, cPlayer))
             {
                 randomNum = 100;
             }
-            // upLeft, down, up, upRight, downLeft, left, right, downRight
+            //Do the move. upLeft, down, up, upRight, downLeft, left, right, downRight
             switch (randomNum)
             {
                 case 1:
@@ -150,12 +120,14 @@ public class GameWorld
         }
     }
 
-    public void runPlayer()
+    //Move the player
+    public void runPlayer(String move)
     {
-        //Move player based on choices
+        //Only move after turn two.
         if (currentTurn != turn && turn > 2)
         {
-            if(getMoves()[0] == "upLeft")
+            //Move in the proper direction.
+            if(move == "upLeft")
             {
                 if (!checkCollision(1, mPlayer))
                 {
@@ -163,21 +135,21 @@ public class GameWorld
                     mPlayer.setYLoc(mPlayer.getyLoc() - 1);
                 }
             }
-            if(getMoves()[0] == "down")
+            if(move == "down")
             {
                 if (!checkCollision(2, mPlayer))
                 {
                     mPlayer.setYLoc(mPlayer.getyLoc() + 1);
                 }
             }
-            if(getMoves()[0] == "up")
+            if(move == "up")
             {
                 if (!checkCollision(3, mPlayer))
                 {
                     mPlayer.setYLoc(mPlayer.getyLoc() - 1);
                 }
             }
-            if(getMoves()[0] == "upRight")
+            if(move == "upRight")
             {
                 if (!checkCollision(4, mPlayer))
                 {
@@ -185,7 +157,7 @@ public class GameWorld
                     mPlayer.setXLoc(mPlayer.getxLoc() + 1);
                 }
             }
-            if(getMoves()[0] == "downLeft")
+            if(move == "downLeft")
             {
                 if (!checkCollision(5, mPlayer))
                 {
@@ -194,21 +166,21 @@ public class GameWorld
                 }
 
             }
-            if(getMoves()[0] == "left")
+            if(move == "left")
             {
                 if (!checkCollision(6, mPlayer))
                 {
                     mPlayer.setXLoc(mPlayer.getxLoc() - 1);
                 }
             }
-            if(getMoves()[0] == "right")
+            if(move == "right")
             {
                 if (!checkCollision(7, mPlayer))
                 {
                     mPlayer.setXLoc(mPlayer.getxLoc() + 1);
                 }
             }
-            if(getMoves()[0] == "downRight")
+            if(move == "downRight")
             {
                 if (!checkCollision(8, mPlayer))
                 {
@@ -217,111 +189,98 @@ public class GameWorld
                 }
             }
 
-            if(getMoves()[0] == "sUpLeft")
+            //Shoot in the proper direction.
+            if(move == "sUpLeft")
             {
 
             }
-            if(getMoves()[0] == "sDown")
+            if(move == "sDown")
             {
                 if (cPlayer.getyLoc() > mPlayer.getyLoc() && cPlayer.getxLoc() == mPlayer.getxLoc())
                 {
 
                 }
             }
-            if(getMoves()[0] == "sUp")
+            if(move == "sUp")
             {
                 if (cPlayer.getxLoc() == mPlayer.getxLoc() && cPlayer.getyLoc() < mPlayer.getyLoc())
                 {
 
                 }
             }
-            if(getMoves()[0] == "sUpRight")
+            if(move == "sUpRight")
             {
 
             }
-            if(getMoves()[0] == "sDownLeft")
+            if(move == "sDownLeft")
             {
 
             }
-            if(getMoves()[0] == "sLeft")
+            if(move == "sLeft")
             {
                 if (cPlayer.getyLoc() == mPlayer.getyLoc() && cPlayer.getxLoc() < mPlayer.getxLoc())
                 {
 
                 }
             }
-            if(getMoves()[0] == "sRight")
+            if(move == "sRight")
             {
                 if (cPlayer.getxLoc() > mPlayer.getxLoc() && cPlayer.getyLoc() == mPlayer.getyLoc())
                 {
 
                 }
             }
-            if(getMoves()[0] == "sDownRight")
+            if(move == "sDownRight")
             {
 
             }
 
-            //Shift move tiles over
+            //Shift move tiles over by one
             setMoves(0, getMoves()[1]);
             setMoves(1, getMoves()[2]);
             setMoves(2, "add");
-            System.out.println(mPlayer.getxLoc() + " " + mPlayer.getyLoc());
-        }
 
+            System.out.println("Player location is: "
+                    + mPlayer.getxLoc() + " , " + mPlayer.getyLoc());
+        }
+        //Start the next turn.
         if(currentTurn != turn)
         {
             currentTurn ++;
         }
     }
 
-    //The main brain for the game
-    //TODO: Split this up into smaller voids
-    public void updateRunning(float delta)
+    //Prevent either player from moving in a way to leave the field
+    private boolean checkCollision(int direction, Player playerr)
     {
-        if (delta > .15f)
+        int xLoc = playerr.getxLoc();
+        int yLoc = playerr.getyLoc();
+        int size = mBoard.getSize();
+        // upLeft, down, up, upRight, downLeft, left, right, downRight
+        switch (direction)
         {
-            delta = .15f;
+            case 1:
+                return (xLoc - 1 == 0 || yLoc - 1 == 0);
+            case 2:
+                return (yLoc + 1 > size);
+            case 3:
+                return (yLoc - 1 == 0);
+            case 4:
+                return (xLoc + 1 > size || yLoc - 1 == 0);
+            case 5:
+                return (xLoc - 1 == 0 || yLoc + 1 > size);
+            case 6:
+                return (xLoc - 1 == 0);
+            case 7:
+                return (xLoc + 1 > size);
+            case 8:
+                return (xLoc + 1 > size || yLoc + 1 > size);
+            default:
+                return true;
         }
-
-        runComputer();
-        runPlayer();
-
-        //Useless code below
-        //TODO: Check to remove
-        if (turn > 2)
-        {
-
-        }
-
-        mPlayer.update(delta);
     }
 
-    public Player getPlayer()
-    {
-        return mPlayer;
-    }
-
-    public int getTurn()
-    {
-        return turn;
-    }
-
-    public void setTurn(int turn)
-    {
-        this.turn = turn;
-    }
-
-    public Board getBoard()
-    {
-        return mBoard;
-    }
-
-    public int getMidPointY() {
-        return midPointY;
-    }
-
-    //Switch from menu to game
+    //Switch from menu to running
     public void ready(boolean transition)
     {
         currentState = GameState.RUNNING;
@@ -331,7 +290,7 @@ public class GameWorld
         }
     }
 
-    //Switch to showing move choices
+    //Bring up UI for picking next move.
     public void choice()
     {
         currentState = GameState.CHOICE;
@@ -340,51 +299,60 @@ public class GameWorld
     //Restart the game
     public void restart()
     {
-        score = 0;
         mPlayer.onRestart();
         ready(true);
     }
 
-
     //Check for state
-    public boolean isGameOver() {
+    public boolean isGameOver()
+    {
         return currentState == GameState.GAMEOVER;
     }
-
-    public boolean isHighScore() {
+    public boolean isHighScore()
+    {
         return currentState == GameState.HIGHSCORE;
     }
-
     public boolean isMenu() {
         return currentState == GameState.MENU;
     }
-
     public boolean isChoice()
     {
         return currentState == GameState.CHOICE;
     }
-
     public boolean isRunning() {
         return currentState == GameState.RUNNING;
     }
 
-
+    //Getters and setters.
     public void setRenderer(GameRenderer renderer) {
         this.renderer = renderer;
     }
-
     public String[] getMoves()
     {
         return moves;
     }
-
     public Player getCPlayer()
     {
         return cPlayer;
     }
-
     public void setMoves(int position, String value)
     {
         moves[position] = value;
+    }
+    public Player getPlayer()
+    {
+        return mPlayer;
+    }
+    public int getTurn()
+    {
+        return turn;
+    }
+    public void setTurn(int turn)
+    {
+        this.turn = turn;
+    }
+    public Board getBoard()
+    {
+        return mBoard;
     }
 }

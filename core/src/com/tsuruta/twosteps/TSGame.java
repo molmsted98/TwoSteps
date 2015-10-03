@@ -8,16 +8,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tsuruta.Screens.SplashScreen;
 import com.tsuruta.TSHelpers.AssetLoader;
 
-public class TSGame extends Game {
-
+public class TSGame extends Game
+{
 	@Override
-	public void create() {
+	public void create()
+	{
 		AssetLoader.load();
 		setScreen(new SplashScreen(this));
 	}
 
 	@Override
-	public void dispose() {
+	public void dispose()
+	{
 		super.dispose();
 		AssetLoader.dispose();
 	}

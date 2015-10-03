@@ -11,13 +11,14 @@ import com.tsuruta.TSHelpers.InputHandler;
  */
 public class GameScreen implements Screen
 {
+    //Instance variables.
     private GameWorld world;
     private GameRenderer renderer;
     private float runTime;
 
-    // This is the constructor, not the class declaration
-    public GameScreen() {
-
+    //Constructor for the game.
+    public GameScreen()
+    {
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
         float gameWidth = 136;
@@ -30,34 +31,26 @@ public class GameScreen implements Screen
         world.setRenderer(renderer);
     }
 
+    //Causes the game update to happen, and image update.
     @Override
-    public void render(float delta) {
+    public void render(float delta)
+    {
         runTime += delta;
         world.update(delta);
         renderer.render(delta, runTime);
     }
 
+    //Default methods.
     @Override
-    public void resize(int width, int height) {
-    }
-
+    public void resize(int width, int height) {}
     @Override
-    public void show() {
-    }
-
+    public void show() {}
     @Override
-    public void hide() {
-    }
-
+    public void hide() {}
     @Override
-    public void pause() {
-    }
-
+    public void pause() {}
     @Override
-    public void resume() {
-    }
-
+    public void resume() {}
     @Override
-    public void dispose() {
-    }
+    public void dispose() {}
 }

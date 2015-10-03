@@ -18,26 +18,12 @@ public class InputHandler implements InputProcessor
 {
     private GameWorld mWorld;
     private Board mBoard;
-
     private List<SimpleButton> menuButtons;
-
-    private SimpleButton add;
-    private SimpleButton start;
-    private SimpleButton upLeft;
-    private SimpleButton up;
-    private SimpleButton upRight;
-    private SimpleButton left;
-    private SimpleButton right;
-    private SimpleButton downLeft;
-    private SimpleButton down;
-    private SimpleButton downRight;
-
+    private SimpleButton add, start, upLeft, up, upRight, left, right, downLeft, down, downRight;
     private SimpleButton sUpLeft, sUp, sUpRight, sLeft, sRight, sDownLeft, sDown, sDownRight;
+    private float scaleFactorX, scaleFactorY;
 
-    private float scaleFactorX;
-    private float scaleFactorY;
-
-    //Get location of buttons
+    //Create all buttons, including location and texture.
     public InputHandler(GameWorld myWorld, float scaleFactorX,
                         float scaleFactorY) {
         this.mWorld = myWorld;
@@ -47,6 +33,7 @@ public class InputHandler implements InputProcessor
         this.scaleFactorY = scaleFactorY;
 
         menuButtons = new ArrayList<SimpleButton>();
+
         add = new SimpleButton((mBoard.getSize() * 11) + 2, 0, 11, 11, AssetLoader.add);
         start = new SimpleButton(0, 0, 22, 22, AssetLoader.bg);
 
@@ -73,7 +60,7 @@ public class InputHandler implements InputProcessor
         menuButtons.add(up);
     }
 
-    //See if button was clicked
+    //See if a button was clicked
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button)
     {
@@ -86,23 +73,6 @@ public class InputHandler implements InputProcessor
         }
         else if (mWorld.isRunning() || mWorld.isChoice())
         {
-            add.isTouchDown(screenX, screenY);
-            upLeft.isTouchDown(screenX, screenY);
-            up.isTouchDown(screenX, screenY);
-            upRight.isTouchDown(screenX, screenY);
-            left.isTouchDown(screenX, screenY);
-            right.isTouchDown(screenX, screenY);
-            downLeft.isTouchDown(screenX, screenY);
-            downRight.isTouchDown(screenX, screenY);
-
-            sUpLeft.isTouchDown(screenX, screenY);
-            sUp.isTouchDown(screenX, screenY);
-            sUpRight.isTouchDown(screenX, screenY);
-            sLeft.isTouchDown(screenX, screenY);
-            sRight.isTouchDown(screenX, screenY);
-            sDownLeft.isTouchDown(screenX, screenY);
-            sDownRight.isTouchDown(screenX, screenY);
-
             if (!add.isTouchDown(screenX, screenY) && !upLeft.isTouchDown(screenX, screenY) &&
                     !up.isTouchDown(screenX, screenY) && !upRight.isTouchDown(screenX, screenY) &&
                     !left.isTouchDown(screenX, screenY) && !right.isTouchDown(screenX, screenY) &&
@@ -116,33 +86,12 @@ public class InputHandler implements InputProcessor
                 mWorld.ready(false);
             }
         }
-
-        if (mWorld.isGameOver() || mWorld.isHighScore())
+        else if (mWorld.isGameOver() || mWorld.isHighScore())
         {
             mWorld.restart();
         }
 
         return true;
-    }
-
-
-    //Update choices with new tile
-    private void setMove(String move)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            if (mWorld.getMoves()[i] == "add")
-            {
-                mWorld.setMoves(i, move);
-                mWorld.setTurn(mWorld.getTurn() + 1);
-                if (i != 2)
-                {
-                    add.changeX((add.getX() + 11));
-                }
-                break;
-            }
-        }
-        mWorld.ready(false);
     }
 
     //See if button was meant to be clicked
@@ -236,52 +185,70 @@ public class InputHandler implements InputProcessor
             }
             for (int i = 0; i < 3; i ++)
             {
-                System.out.println(mWorld.getMoves()[i]);
+                System.out.println("Move " + i + " is " + mWorld.getMoves()[i]);
             }
-            System.out.println(mWorld.getTurn());
+            System.out.println("Current turn is: " + mWorld.getTurn());
         }
         return false;
     }
 
+    //Update choices with new tile
+    private void setMove(String move)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (mWorld.getMoves()[i] == "add")
+            {
+                mWorld.setMoves(i, move);
+                mWorld.setTurn(mWorld.getTurn() + 1);
+                if (i != 2)
+                {
+                    add.changeX((add.getX() + 11));
+                }
+                break;
+            }
+        }
+        mWorld.ready(false);
+    }
+
+    //Scale button placement to screen size.
+    private int scaleX(int screenX)
+    {
+        return (int) (screenX / scaleFactorX);
+    }
+    private int scaleY(int screenY)
+    {
+        return (int) (screenY / scaleFactorY);
+    }
+
+    //Used to check all of the buttons.
+    public List<SimpleButton> getMenuButtons() {
+        return menuButtons;
+    }
+
+    //Default input methods.
     @Override
     public boolean keyDown(int keycode) {
         return false;
     }
-
     @Override
     public boolean keyUp(int keycode) {
         return false;
     }
-
     @Override
     public boolean keyTyped(char character) {
         return false;
     }
-
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
-
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
-
     @Override
     public boolean scrolled(int amount) {
         return false;
-    }
-
-    private int scaleX(int screenX) {
-        return (int) (screenX / scaleFactorX);
-    }
-
-    private int scaleY(int screenY) {
-        return (int) (screenY / scaleFactorY);
-    }
-
-    public List<SimpleButton> getMenuButtons() {
-        return menuButtons;
     }
 }

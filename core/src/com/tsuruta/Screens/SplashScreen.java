@@ -25,12 +25,26 @@ public class SplashScreen implements Screen
     private Sprite sprite;
     private TSGame game;
 
-    public SplashScreen(TSGame game) {
+    public SplashScreen(TSGame game)
+    {
         this.game = game;
     }
 
+    //Show the splash screen.
     @Override
-    public void show() {
+    public void render(float delta)
+    {
+        manager.update(delta);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batcher.begin();
+        sprite.draw(batcher);
+        batcher.end();
+    }
+
+    @Override
+    public void show()
+    {
         sprite = new Sprite(AssetLoader.logo);
         sprite.setColor(1, 1, 1, 0);
 
@@ -46,7 +60,8 @@ public class SplashScreen implements Screen
         batcher = new SpriteBatch();
     }
 
-    private void setupTween() {
+    private void setupTween()
+    {
         Tween.registerAccessor(Sprite.class, new SpriteAccessor());
         manager = new TweenManager();
 
@@ -63,42 +78,15 @@ public class SplashScreen implements Screen
                 .start(manager);
     }
 
+    //Default methods.
     @Override
-    public void render(float delta) {
-        manager.update(delta);
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batcher.begin();
-        sprite.draw(batcher);
-        batcher.end();
-    }
-
+    public void resize(int width, int height) {}
     @Override
-    public void resize(int width, int height) {
-
-    }
-
+    public void hide() {}
     @Override
-    public void hide() {
-        // TODO Auto-generated method stub
-
-    }
-
+    public void pause() {}
     @Override
-    public void pause() {
-        // TODO Auto-generated method stub
-
-    }
-
+    public void resume() {}
     @Override
-    public void resume() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void dispose() {
-        // TODO Auto-generated method stub
-
-    }
+    public void dispose() {}
 }

@@ -1,17 +1,16 @@
 package com.tsuruta.GameObjects;
 
-import com.tsuruta.TSHelpers.AssetLoader;
-
 /**
  * Created by Michael on 8/28/2015.
  */
 public class Player
 {
+    //Instance variables.
     private int health;
     private int xLoc;
     private int yLoc;
 
-    //Initialize variables
+    //Make a player at a starting point with health.
     public Player(int startX, int startY, int health)
     {
         this.health = health;
@@ -19,41 +18,28 @@ public class Player
         yLoc = startY;
     }
 
-    public void updateReady(float delta)
-    {
-
-    }
-
-    public void update(float delta)
-    {
-
-    }
-
     public void onRestart()
     {
         health = 3;
     }
 
+    //Getters and setters.
     public int getxLoc()
     {
         return xLoc;
     }
-
     public void setXLoc(int x)
     {
         this.xLoc = x;
     }
-
     public void setYLoc(int y)
     {
         this.yLoc = y;
     }
-
     public int getHealth()
     {
         return health;
     }
-
     public int getyLoc()
     {
         return yLoc;
