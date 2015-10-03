@@ -1,10 +1,7 @@
 package com.tsuruta.GameWorld;
 
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.tsuruta.GameObjects.Board;
 import com.tsuruta.GameObjects.Player;
-import com.tsuruta.TSHelpers.AssetLoader;
 
 import java.util.Random;
 
@@ -164,7 +161,6 @@ public class GameWorld
                     mPlayer.setXLoc(mPlayer.getxLoc() - 1);
                     mPlayer.setYLoc(mPlayer.getyLoc() + 1);
                 }
-
             }
             if(move == "left")
             {

@@ -3,13 +3,15 @@ package com.tsuruta.GameObjects;
 /**
  * Created by Michael on 8/28/2015.
  */
-public class Board {
+public class Board
+{
     //Instance variables.
     private int size;
     private String type;
 
     //Construct a board of certain dimension and terrain type.
-    public Board(int size) {
+    public Board(int size)
+    {
         this.size = size;
         //this.type = type;
     }

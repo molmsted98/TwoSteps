@@ -1,10 +1,7 @@
 package com.tsuruta.TSHelpers;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.tsuruta.GameObjects.Board;
-import com.tsuruta.GameObjects.Player;
-import com.tsuruta.GameWorld.GameRenderer;
 import com.tsuruta.GameWorld.GameWorld;
 import com.tsuruta.ui.SimpleButton;
 
@@ -25,7 +22,8 @@ public class InputHandler implements InputProcessor
 
     //Create all buttons, including location and texture.
     public InputHandler(GameWorld myWorld, float scaleFactorX,
-                        float scaleFactorY) {
+                        float scaleFactorY)
+    {
         this.mWorld = myWorld;
         mBoard = myWorld.getBoard();
 
