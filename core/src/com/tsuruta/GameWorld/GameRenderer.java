@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tsuruta.GameObjects.Board;
 import com.tsuruta.GameObjects.Player;
@@ -33,15 +32,15 @@ public class GameRenderer
     private SpriteBatch batcher;
 
     private int midPointY;
-
+    private int currentX;
+    private int currentY;
+    private int cCurrentX;
+    private int cCurrentY;
+    private double animation;
+    private double cAnimation;
     // Game Objects
     private Player mPlayer, cPlayer;
     private Board mBoard;
-
-    // Game Assets
-    private TextureRegion up, down, left, right, upRight, upLeft, downRight, downLeft,
-            sUp, sDown, sLeft, sRight, sUpRight, sUpLeft, sDownRight, sDownLeft,
-            bg, p1, p2, add, moveCenter, shootCenter;
 
     //Transition helpers
     private TweenManager manager;
@@ -68,7 +67,6 @@ public class GameRenderer
         shapeRenderer.setProjectionMatrix(cam.combined);
 
         initGameObjects();
-        initAssets();
 
         transitionColor = new Color();
         prepareTransition(255, 255, 255, .5f);
@@ -78,52 +76,12 @@ public class GameRenderer
     private void initGameObjects()
     {
         mPlayer = myWorld.getPlayer();
+        currentX = mPlayer.getxLoc();
+        currentY = mPlayer.getyLoc();
         mBoard = myWorld.getBoard();
         cPlayer = myWorld.getCPlayer();
-    }
-
-    //Add pictures to objects to be drawn.
-    private void initAssets()
-    {
-        bg = AssetLoader.bg;
-        up = AssetLoader.up;
-        up.flip(false, true);
-        down = AssetLoader.down;
-        down.flip(false, true);
-        left = AssetLoader.left;
-        left.flip(true, false);
-        right = AssetLoader.right;
-        right.flip(true, false);
-        upRight = AssetLoader.upRight;
-        upRight.flip(false, true);
-        upLeft = AssetLoader.upLeft;
-        downRight = AssetLoader.downRight;
-        downRight.flip(true, false);
-        downLeft = AssetLoader.downLeft;
-        downLeft.flip(true, true);
-        sUp = AssetLoader.sUp;
-        sUp.flip(false, true);
-        sDown = AssetLoader.sDown;
-        sDown.flip(false, true);
-        sLeft = AssetLoader.sLeft;
-        sLeft.flip(true, false);
-        sRight = AssetLoader.sRight;
-        sRight.flip(true, false);
-        sUpRight = AssetLoader.sUpRight;
-        sUpRight.flip(false, true);
-        sUpLeft = AssetLoader.sUpLeft;
-        sDownRight = AssetLoader.sDownRight;
-        sDownRight.flip(true, false);
-        sDownLeft = AssetLoader.sDownLeft;
-        sDownLeft.flip(true, true);
-        bg = AssetLoader.bg;
-        p1 = AssetLoader.p1;
-        p2 = AssetLoader.p2;
-        add = AssetLoader.add;
-        moveCenter = AssetLoader.moveCenter;
-        moveCenter.flip(false, true);
-        shootCenter = AssetLoader.shootCenter;
-        shootCenter.flip(false, true);
+        cCurrentX = cPlayer.getxLoc();
+        cCurrentY = cPlayer.getyLoc();
     }
 
     //Get the transition ready to be used.
@@ -156,10 +114,11 @@ public class GameRenderer
         {
             drawButtons();
         }
-        else if (myWorld.isRunning() || myWorld.isChoice())
+        else if (myWorld.isRunning() || myWorld.isChoice() || myWorld.isMoving())
         {
             drawBoard();
             drawPlayer();
+            drawComputer();
             drawButtons();
             drawMoveChoices();
             drawShootChoices();
@@ -175,7 +134,7 @@ public class GameRenderer
         {
             for (int e = 0; e < mBoard.getSize(); e++)
             {
-                batcher.draw(bg, i*11, e*11);
+                batcher.draw(AssetLoader.bg, i*11, e*11);
             }
         }
     }
@@ -184,8 +143,134 @@ public class GameRenderer
     private void drawPlayer()
     {
         batcher.enableBlending();
-        batcher.draw(p1, (mPlayer.getxLoc() - 1) * 11, (mPlayer.getyLoc() - 1) * 11);
-        batcher.draw(p2, (cPlayer.getxLoc() - 1) * 11, (cPlayer.getyLoc() - 1) * 11);
+        //Meaning that the player has just moved, start animation.
+        if (currentY != mPlayer.getyLoc() && currentX != mPlayer.getxLoc())
+        {
+            myWorld.moving();
+            int changeX = mPlayer.getxLoc() - currentX;
+            int changeY = mPlayer.getyLoc() - currentY;
+            if (animation < 30)
+            {
+                batcher.draw(AssetLoader.p1,
+                        ((currentX - 1) * 11) + (int)(changeX * (11 * (animation/30))),
+                            ((currentY - 1) * 11) + (int)(changeY * (11 * (animation/30))));
+                animation ++;
+            }
+            else
+            {
+                currentY = mPlayer.getyLoc();
+                currentX = mPlayer.getxLoc();
+                animation = 0;
+                myWorld.running();
+            }
+        }
+        else if (currentY != mPlayer.getyLoc())
+        {
+            myWorld.moving();
+            int changeY = mPlayer.getyLoc() - currentY;
+            if (animation < 30)
+            {
+                batcher.draw(AssetLoader.p1, (currentX - 1) * 11,
+                        ((currentY - 1) * 11) + (int)(changeY * (11 * (animation/30))));
+                animation ++;
+            }
+            else
+            {
+                currentY = mPlayer.getyLoc();
+                animation = 0;
+                myWorld.running();
+            }
+        }
+        else if (currentX != mPlayer.getxLoc())
+        {
+            myWorld.moving();
+            int changeX = mPlayer.getxLoc() - currentX;
+            if (animation < 30)
+            {
+                batcher.draw(AssetLoader.p1,
+                        (currentX - 1) * 11 + (int)(changeX * (11 * (animation/30))),
+                            ((currentY - 1) * 11));
+                animation ++;
+            }
+            else
+            {
+                currentX = mPlayer.getxLoc();
+                animation = 0;
+                myWorld.running();
+            }
+        }
+        else
+        {
+            batcher.draw(AssetLoader.p1, (mPlayer.getxLoc() - 1) * 11, (mPlayer.getyLoc() - 1) * 11);
+        }
+        batcher.disableBlending();
+    }
+
+    private void drawComputer()
+    {
+        batcher.enableBlending();
+        if (myWorld.isMoving())
+        {
+            batcher.draw(AssetLoader.p2, (cCurrentX - 1) * 11, (cCurrentY - 1) * 11);
+        }
+        else
+        {
+            //Meaning that the player has just moved, start animation.
+            if (cCurrentY != cPlayer.getyLoc() && cCurrentX != cPlayer.getxLoc())
+            {
+                int changeX = cPlayer.getxLoc() - cCurrentX;
+                int changeY = cPlayer.getyLoc() - cCurrentY;
+                if (cAnimation < 30)
+                {
+                    batcher.draw(AssetLoader.p2,
+                            ((cCurrentX - 1) * 11) + (int)(changeX * (11 * (cAnimation/30))),
+                            ((cCurrentY - 1) * 11) + (int)(changeY * (11 * (cAnimation/30))));
+                }
+                else
+                {
+                    cCurrentY = cPlayer.getyLoc();
+                    cCurrentX = cPlayer.getxLoc();
+                    cAnimation = 0;
+                }
+                cAnimation ++;
+            }
+            else if (cCurrentY != cPlayer.getyLoc())
+            {
+                int changeY = cPlayer.getyLoc() - cCurrentY;
+                if (cAnimation < 30)
+                {
+                    batcher.draw(AssetLoader.p2, (cCurrentX - 1) * 11,
+                            ((cCurrentY - 1) * 11) + (int)(changeY * (11 * (cAnimation/30))));
+                }
+                else
+                {
+                    cCurrentY = cPlayer.getyLoc();
+                    cAnimation = 0;
+                }
+                cAnimation ++;
+            }
+            else if (cCurrentX != cPlayer.getxLoc())
+            {
+                int changeX = cPlayer.getxLoc() - cCurrentX;
+                if (cAnimation < 30)
+                {
+                    batcher.draw(AssetLoader.p2,
+                            (cCurrentX - 1) * 11 + (int)(changeX * (11 * (cAnimation/30))),
+                            ((cCurrentY - 1) * 11));
+                }
+                else
+                {
+                    cCurrentX = cPlayer.getxLoc();
+                    cAnimation = 0;
+                }
+                cAnimation ++;
+            }
+            else
+            {
+                batcher.draw(AssetLoader.p2, (cCurrentX - 1) * 11, (cCurrentY - 1) * 11);
+            }
+        }
+
         batcher.disableBlending();
     }
 
@@ -194,7 +279,7 @@ public class GameRenderer
     {
         if (myWorld.isMenu())
         {
-            batcher.draw(bg, 0, 0, 22, 22);
+            batcher.draw(AssetLoader.bg, 0, 0, 22, 22);
         }
         else if(myWorld.isRunning())
         {
@@ -203,26 +288,26 @@ public class GameRenderer
         }
         else if (myWorld.isChoice())
         {
-            batcher.draw(add, (mBoard.getSize() * 11) + 2, 0);
-            batcher.draw(upLeft, 0, 0);
-            batcher.draw(up, 11, 0);
-            batcher.draw(upRight, 22, 0);
-            batcher.draw(left, 0, 11);
-            batcher.draw(moveCenter, 11, 11);
-            batcher.draw(right, 22, 11);
-            batcher.draw(downLeft, 0, 22);
-            batcher.draw(down, 11, 22);
-            batcher.draw(downRight, 22, 22);
+            batcher.draw(AssetLoader.add, (mBoard.getSize() * 11) + 2, 0);
+            batcher.draw(AssetLoader.upLeft, 0, 0);
+            batcher.draw(AssetLoader.up, 11, 0);
+            batcher.draw(AssetLoader.upRight, 22, 0);
+            batcher.draw(AssetLoader.left, 0, 11);
+            batcher.draw(AssetLoader.moveCenter, 11, 11);
+            batcher.draw(AssetLoader.right, 22, 11);
+            batcher.draw(AssetLoader.downLeft, 0, 22);
+            batcher.draw(AssetLoader.down, 11, 22);
+            batcher.draw(AssetLoader.downRight, 22, 22);
 
-            batcher.draw(sUpLeft, 46, 0);
-            batcher.draw(sUp, 57, 0);
-            batcher.draw(sUpRight, 68, 0);
-            batcher.draw(sLeft, 46, 11);
-            batcher.draw(shootCenter, 57, 11);
-            batcher.draw(sRight, 68, 11);
-            batcher.draw(sDownLeft, 46, 22);
-            batcher.draw(sDown, 57, 22);
-            batcher.draw(sDownRight, 68, 22);
+            batcher.draw(AssetLoader.sUpLeft, 46, 0);
+            batcher.draw(AssetLoader.sUp, 57, 0);
+            batcher.draw(AssetLoader.sUpRight, 68, 0);
+            batcher.draw(AssetLoader.sLeft, 46, 11);
+            batcher.draw(AssetLoader.shootCenter, 57, 11);
+            batcher.draw(AssetLoader.sRight, 68, 11);
+            batcher.draw(AssetLoader.sDownLeft, 46, 22);
+            batcher.draw(AssetLoader.sDown, 57, 22);
+            batcher.draw(AssetLoader.sDownRight, 68, 22);
         }
     }
 
@@ -233,39 +318,39 @@ public class GameRenderer
         {
             if(myWorld.getMoves()[i] == "add")
             {
-                batcher.draw(add, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.add, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "upLeft")
             {
-                batcher.draw(upLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.upLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "upRight")
             {
-                batcher.draw(upRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.upRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "down")
             {
-                batcher.draw(down, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.down, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "up")
             {
-                batcher.draw(up, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.up, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "downLeft")
             {
-                batcher.draw(downLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.downLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "downRight")
             {
-                batcher.draw(downRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.downRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i].equals("left"))
             {
-                batcher.draw(left, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.left, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i].equals("right"))
             {
-                batcher.draw(right, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.right, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
         }
     }
@@ -277,35 +362,35 @@ public class GameRenderer
         {
             if(myWorld.getMoves()[i].equals("sUpLeft"))
             {
-                batcher.draw(sUpLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sUpLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i].equals("sUpRight"))
             {
-                batcher.draw(sUpRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sUpRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i].equals("sDown"))
             {
-                batcher.draw(sDown, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sDown, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "sUp")
             {
-                batcher.draw(sUp, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sUp, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "sDownLeft")
             {
-                batcher.draw(sDownLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sDownLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "sDownRight")
             {
-                batcher.draw(sDownRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sDownRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "sLeft")
             {
-                batcher.draw(sLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sLeft, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
             if(myWorld.getMoves()[i] == "sRight")
             {
-                batcher.draw(sRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+                batcher.draw(AssetLoader.sRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
             }
         }
     }

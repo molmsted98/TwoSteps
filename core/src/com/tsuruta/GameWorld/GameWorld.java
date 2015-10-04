@@ -1,5 +1,6 @@
 package com.tsuruta.GameWorld;
 
+import com.badlogic.gdx.Gdx;
 import com.tsuruta.GameObjects.Board;
 import com.tsuruta.GameObjects.Player;
 
@@ -27,7 +28,7 @@ public class GameWorld
     //Variable to know which screen is to be shown.
     public enum GameState
     {
-        MENU, RUNNING, CHOICE, GAMEOVER, HIGHSCORE
+        MENU, RUNNING, CHOICE, GAMEOVER, HIGHSCORE, MOVING
     }
 
     //Initialize instance variables. Make players and board.
@@ -36,7 +37,7 @@ public class GameWorld
         currentState = GameState.MENU;
         this.midPointY = midPointY;
         mPlayer = new Player(1, 1, 3);
-        mBoard = new Board(9);
+        mBoard = new Board(5);
         cPlayer = new Player(mBoard.getSize(), mBoard.getSize(), 3);
     }
 
@@ -73,7 +74,7 @@ public class GameWorld
     public void runComputer()
     {
         //Only move after two turns.
-        if (currentTurn != turn && turn > 2)
+        if (currentTurn != turn && turn > 2 && !isMoving())
         {
             //Pick a random move, then check for collision.
             Random rand = new Random();
@@ -114,6 +115,7 @@ public class GameWorld
                     cPlayer.setXLoc(cPlayer.getxLoc() + 1);
                     break;
             }
+            checkMelee(cPlayer, mPlayer);
         }
     }
 
@@ -188,48 +190,38 @@ public class GameWorld
             //Shoot in the proper direction.
             if(move == "sUpLeft")
             {
-
+                checkShotHit(mPlayer, cPlayer, 1);
             }
             if(move == "sDown")
             {
-                if (cPlayer.getyLoc() > mPlayer.getyLoc() && cPlayer.getxLoc() == mPlayer.getxLoc())
-                {
-
-                }
+                checkShotHit(mPlayer, cPlayer, 2);
             }
             if(move == "sUp")
             {
-                if (cPlayer.getxLoc() == mPlayer.getxLoc() && cPlayer.getyLoc() < mPlayer.getyLoc())
-                {
-
-                }
+                checkShotHit(mPlayer, cPlayer, 3);
             }
             if(move == "sUpRight")
             {
-
+                checkShotHit(mPlayer, cPlayer, 4);
             }
             if(move == "sDownLeft")
             {
-
+                checkShotHit(mPlayer, cPlayer, 5);
             }
             if(move == "sLeft")
             {
-                if (cPlayer.getyLoc() == mPlayer.getyLoc() && cPlayer.getxLoc() < mPlayer.getxLoc())
-                {
-
-                }
+                checkShotHit(mPlayer, cPlayer, 6);
             }
             if(move == "sRight")
             {
-                if (cPlayer.getxLoc() > mPlayer.getxLoc() && cPlayer.getyLoc() == mPlayer.getyLoc())
-                {
-
-                }
+                checkShotHit(mPlayer, cPlayer, 7);
             }
             if(move == "sDownRight")
             {
-
+                checkShotHit(mPlayer, cPlayer, 8);
             }
+
+            checkMelee(mPlayer, cPlayer);
 
             //Shift move tiles over by one
             setMoves(0, getMoves()[1]);
@@ -238,6 +230,8 @@ public class GameWorld
 
             System.out.println("Player location is: "
                     + mPlayer.getxLoc() + " , " + mPlayer.getyLoc());
+            System.out.println("Player Two location is: "
+                    + cPlayer.getxLoc() + " , " + cPlayer.getyLoc());
         }
         //Start the next turn.
         if(currentTurn != turn)
@@ -255,24 +249,67 @@ public class GameWorld
         // upLeft, down, up, upRight, downLeft, left, right, downRight
         switch (direction)
         {
-            case 1:
+            case 1: //upLeft
                 return (xLoc - 1 == 0 || yLoc - 1 == 0);
-            case 2:
+            case 2: //Down
                 return (yLoc + 1 > size);
-            case 3:
+            case 3: //Up
                 return (yLoc - 1 == 0);
-            case 4:
+            case 4: //upRight
                 return (xLoc + 1 > size || yLoc - 1 == 0);
-            case 5:
+            case 5: //downLeft
                 return (xLoc - 1 == 0 || yLoc + 1 > size);
-            case 6:
+            case 6: //Left
                 return (xLoc - 1 == 0);
-            case 7:
+            case 7: //Right
                 return (xLoc + 1 > size);
-            case 8:
+            case 8: //downRight
                 return (xLoc + 1 > size || yLoc + 1 > size);
             default:
                 return true;
+        }
+    }
+
+    private void checkShotHit(Player shooter, Player target, int direction)
+    {
+        switch (direction)
+        {
+            case 1: //upLeft
+
+            case 2: //Down
+                if (target.getyLoc() > shooter.getyLoc() && target.getxLoc() == shooter.getxLoc())
+                {
+                    target.setHealth(target.getHealth()-1);
+                }
+            case 3: //Up
+                if (target.getxLoc() == shooter.getxLoc() && target.getyLoc() < shooter.getyLoc())
+                {
+                    target.setHealth(target.getHealth()-1);
+                }
+            case 4: //upRight
+
+            case 5: //downLeft
+
+            case 6: //Left
+                if (target.getyLoc() == shooter.getyLoc() && target.getxLoc() < shooter.getxLoc())
+                {
+                    target.setHealth(target.getHealth()-1);
+                }
+            case 7: //Right
+                if (target.getxLoc() > shooter.getxLoc() && target.getyLoc() == shooter.getyLoc())
+                {
+                    target.setHealth(target.getHealth()-1);
+                }
+            case 8: //downRight
+
+        }
+    }
+
+    private void checkMelee(Player attacker, Player target)
+    {
+        if (attacker.getxLoc() == target.getxLoc() && attacker.getyLoc() == target.getyLoc())
+        {
+            target.setHealth(target.getHealth()-1);
         }
     }
 
@@ -290,6 +327,16 @@ public class GameWorld
     public void choice()
     {
         currentState = GameState.CHOICE;
+    }
+
+    public void moving()
+    {
+        currentState = GameState.MOVING;
+    }
+
+    public void running()
+    {
+        currentState = GameState.RUNNING;
     }
 
     //Restart the game
@@ -317,6 +364,10 @@ public class GameWorld
     }
     public boolean isRunning() {
         return currentState == GameState.RUNNING;
+    }
+    public boolean isMoving()
+    {
+        return currentState == GameState.MOVING;
     }
 
     //Getters and setters.
