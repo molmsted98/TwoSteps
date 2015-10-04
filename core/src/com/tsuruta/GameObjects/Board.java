@@ -3,25 +3,29 @@ package com.tsuruta.GameObjects;
 /**
  * Created by Michael on 8/28/2015.
  */
-public class Board
-{
+public class Board {
     //Instance variables.
     private int size;
-    private String type;
+    private String[][] layout;
 
     //Construct a board of certain dimension and terrain type.
-    public Board(int size)
-    {
+    public Board(int size) {
         this.size = size;
-        //this.type = type;
+        layout = new String[size][size];
     }
 
-    //Getters.
+    //Getters/Setters
     public int getSize() {
         return size;
     }
-    public String getType()
+
+    public void setLayout(int row, int column, String value)
     {
-        return type;
+        layout[row][column] = value;
+    }
+
+    public String getLayout(int row, int column)
+    {
+        return layout[row][column];
     }
 }
