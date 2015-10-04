@@ -40,6 +40,10 @@ public class Player
     {
         return health;
     }
+    public void setHealth(int health)
+    {
+        this.health = health;
+    }
     public int getyLoc()
     {
         return yLoc;
