@@ -51,6 +51,23 @@ public class AssetLoader
         add = new TextureRegion(sTexture, 0, 26, 11, 11);
         moveCenter = new TextureRegion(sTexture, 11, 26, 11, 11);
         shootCenter = new TextureRegion(sTexture, 22, 26, 11, 11);
+
+        up.flip(false, true);
+        down.flip(false, true);
+        left.flip(true, false);
+        right.flip(true, false);
+        upRight.flip(false, true);
+        downRight.flip(true, false);
+        downLeft.flip(true, true);
+        sUp.flip(false, true);
+        sDown.flip(false, true);
+        sLeft.flip(true, false);
+        sRight.flip(true, false);
+        sUpRight.flip(false, true);
+        sDownRight.flip(true, false);
+        sDownLeft.flip(true, true);
+        moveCenter.flip(false, true);
+        shootCenter.flip(false, true);
     }
 
     public static void dispose()
