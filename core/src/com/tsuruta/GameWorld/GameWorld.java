@@ -37,7 +37,7 @@ public class GameWorld
         currentState = GameState.MENU;
         this.midPointY = midPointY;
         mPlayer = new Player(1, 1, 3);
-        mBoard = new Board(5);
+        mBoard = new Board(7);
         cPlayer = new Player(mBoard.getSize(), mBoard.getSize(), 3);
     }
 
@@ -66,8 +66,17 @@ public class GameWorld
         {
             delta = .15f;
         }
+        checkDeath();
         runComputer();
         runPlayer(getMoves()[0]);
+    }
+
+    public void checkDeath()
+    {
+        if (mPlayer.getHealth() == 0 || cPlayer.getHealth() == 0)
+        {
+            currentState = GameState.GAMEOVER;
+        }
     }
 
     //Move the Computer
@@ -232,6 +241,8 @@ public class GameWorld
                     + mPlayer.getxLoc() + " , " + mPlayer.getyLoc());
             System.out.println("Player Two location is: "
                     + cPlayer.getxLoc() + " , " + cPlayer.getyLoc());
+            System.out.println("Player One health is: " + mPlayer.getHealth());
+            System.out.println("Player Two health is: " + cPlayer.getHealth());
         }
         //Start the next turn.
         if(currentTurn != turn)
