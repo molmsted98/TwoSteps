@@ -18,6 +18,7 @@ public class InputHandler implements InputProcessor
     private List<SimpleButton> menuButtons;
     private SimpleButton add, start, upLeft, up, upRight, left, right, downLeft, down, downRight;
     private SimpleButton sUpLeft, sUp, sUpRight, sLeft, sRight, sDownLeft, sDown, sDownRight;
+    private SimpleButton swap;
     private float scaleFactorX, scaleFactorY;
 
     //Create all buttons, including location and texture.
@@ -53,6 +54,8 @@ public class InputHandler implements InputProcessor
         sDown = new SimpleButton(57, 22, 11, 11, AssetLoader.down);
         sDownRight = new SimpleButton(68, 22, 11, 11, AssetLoader.downRight);
 
+        swap = new SimpleButton(40, 40, 11, 11, AssetLoader.bg);
+
         menuButtons.add(upLeft);
         menuButtons.add(left);
         menuButtons.add(up);
@@ -79,7 +82,7 @@ public class InputHandler implements InputProcessor
                     !sUp.isTouchDown(screenX, screenY) && !sUpRight.isTouchDown(screenX, screenY) &&
                     !sLeft.isTouchDown(screenX, screenY) && !sRight.isTouchDown(screenX, screenY) &&
                     !sDownLeft.isTouchDown(screenX, screenY) && !sDownRight.isTouchDown(screenX, screenY) &&
-                    !sDown.isTouchDown(screenX, screenY))
+                    !sDown.isTouchDown(screenX, screenY) && !swap.isTouchDown(screenX, screenY))
             {
                 mWorld.ready(false);
             }
@@ -181,6 +184,20 @@ public class InputHandler implements InputProcessor
             {
                 setMove("sRight");
             }
+
+            if (swap.isTouchUp(screenX, screenY))
+            {
+                if (mWorld.getMoves()[0] == "add" || mWorld.getMoves()[1] == "add")
+                {
+                    System.out.println("Not enough tiles available to swap");
+                }
+                else
+                {
+                    System.out.println("Swapped a tile");
+                    swapMove();
+                    setMove("swap");
+                }
+            }
             for (int i = 0; i < 3; i ++)
             {
                 System.out.println("Move " + i + " is " + mWorld.getMoves()[i]);
@@ -207,6 +224,13 @@ public class InputHandler implements InputProcessor
             }
         }
         mWorld.ready(false);
+    }
+
+    private void swapMove()
+    {
+        String temp = mWorld.getMoves()[0];
+        mWorld.setMoves(0, mWorld.getMoves()[1]);
+        mWorld.setMoves(1, temp);
     }
 
     //Scale button placement to screen size.
