@@ -308,6 +308,8 @@ public class GameRenderer
             batcher.draw(AssetLoader.sDownLeft, 46, 22);
             batcher.draw(AssetLoader.sDown, 57, 22);
             batcher.draw(AssetLoader.sDownRight, 68, 22);
+
+            batcher.draw(AssetLoader.bg, 40, 40);
         }
     }
 
@@ -391,6 +393,11 @@ public class GameRenderer
             if(myWorld.getMoves()[i] == "sRight")
             {
                 batcher.draw(AssetLoader.sRight, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+            }
+            if(myWorld.getMoves()[i] == "swap")
+            {
+                batcher.draw(AssetLoader.bg, (mBoard.getSize() * 11) + (11*i) + 2, 0);
+
             }
         }
     }
